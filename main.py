@@ -97,8 +97,8 @@ class MainWindow(object):
     def normal_game(self):
         self.game_size = 8
         self.icon_kind = self.game_size * self.game_size / 4
-        self.canvas_width = 370
-        self.canvas_height = 370
+        self.canvas_width = 367
+        self.canvas_height = 367
         self.new_game()
 
     def hard_game(self):
