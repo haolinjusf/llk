@@ -51,7 +51,7 @@ def center_window(width, height):
 class MainWindow(object):
     plants = []  # 植物名称列表
     game_title = "植物连连看"  # 窗口标题
-    window_width = 700  # 窗口宽度
+    window_width = 600  # 窗口宽度
     window_height = 500  # 窗口长度
     icons = []  # 连连看图标列表
     game_size = 10  # 游戏尺寸
@@ -75,10 +75,24 @@ class MainWindow(object):
         """
         root.title(self.game_title)
         center_window(self.window_width, self.window_height)
-        root.minsize(460, 460)
+        root.minsize(500, 500)
 
         self.__add_components()
         self.extract_small_icon_list()
+
+    def easy_game(self):
+        self.game_size = 6
+        self.icon_kind = self.game_size * self.game_size / 2
+        self.new_game()
+
+    def normal_game(self):
+        self.game_size = 8
+        self.icon_kind = self.game_size * self.game_size / 2
+        self.new_game()
+
+    def hard_game(self):
+        self.game_size = 10
+        self.icon_kind = self.game_size * self.game_size / 4
         self.new_game()
 
     def __add_components(self):
@@ -89,12 +103,14 @@ class MainWindow(object):
         self.menubar = tk.Menu(root, bg="lightgrey", fg="black")
 
         self.file_menu = tk.Menu(self.menubar, tearoff=0, bg="lightgrey", fg="black")
-        self.file_menu.add_command(label="新游戏", command=self.new_game, accelerator="Ctrl+N")  # 点击后，触发函数new_game
+        self.file_menu.add_command(label="新游戏(低难度)", command=self.easy_game)  # 点击后，触发函数new_game
+        self.file_menu.add_command(label="新游戏(中难度)", command=self.normal_game)  # 点击后，触发函数new_game
+        self.file_menu.add_command(label="新游戏(高难度)", command=self.hard_game)  # 点击后，触发函数new_game
 
         self.menubar.add_cascade(label="游戏", menu=self.file_menu)
         root.configure(menu=self.menubar)
 
-        self.canvas = tk.Canvas(root, bg='white', width=440, height=450)
+        self.canvas = tk.Canvas(root, bg='white', width=450, height=450)
         self.canvas.pack(side=tk.TOP, pady=5)
         self.canvas.bind('<Button-1>', self.click_canvas)
 
@@ -169,7 +185,7 @@ class MainWindow(object):
                             self.canvas.delete("rectRedOne")
                             self.is_first = True
                             if self.is_game_end():
-                                tk.messagebox.showinfo("You Win!", "Tip")
+                                tk.messagebox.showinfo("You Win!", "恭喜你，～你胜利啦～(⁎⁍̴̛ᴗ⁍̴̛⁎)")
                                 self.is_game_start = False
                         else:
                             self.former_point = point
@@ -192,10 +208,14 @@ class MainWindow(object):
         从项目根目录中的"images"文件夹中获取图标数组
         :return:
         """
-        path = 'images'
+        path, idx = 'images', 0
         for img in os.listdir(path):
-            self.icons.append(ImageTk.PhotoImage(Image.open(path + '/' + img)))
-            self.plants.append(img.split('.')[0])
+            if img.split('.')[-1] in {'jpg', 'png'}:
+                if idx >= self.icon_kind:
+                    break
+                self.icons.append(ImageTk.PhotoImage(Image.open(path + '/' + img)))
+                self.plants.append(img.split('.')[0])
+                idx += 1
 
     def get_outer_left_top_point(self, point):
         """
