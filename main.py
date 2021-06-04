@@ -1,8 +1,9 @@
 import os
 import random
 import tkinter as tk
-from PIL import Image, ImageTk
 from tkinter import messagebox
+
+from PIL import Image, ImageTk
 
 root = tk.Tk()
 
@@ -55,8 +56,8 @@ class MainWindow(object):
     icons = []  # 连连看图标列表
     game_size = 10  # 游戏尺寸
     icon_kind = game_size * game_size / 4  # 图标种类数量（图标数量需符合要求才能开始游戏）
-    icon_width = 40  # 图标宽度设置（每个图标的长度需符合要求才能开始游戏）
-    icon_height = 40  # 图标长度设置（每个图标的宽度需符合要求才能开始游戏）
+    icon_width = 40  # 图标宽度设置
+    icon_height = 40  # 图标长度设置
     map = []  # 游戏地图
     delta = 25
     is_first = True
