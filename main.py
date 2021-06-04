@@ -58,6 +58,8 @@ class MainWindow(object):
     icon_kind = game_size * game_size / 4  # 图标种类数量（图标数量需符合要求才能开始游戏）
     icon_width = 40  # 图标宽度设置
     icon_height = 40  # 图标长度设置
+    canvas_width = 450
+    canvas_height = 450
     map = []  # 游戏地图
     delta = 25
     is_first = True
@@ -75,24 +77,32 @@ class MainWindow(object):
         """
         root.title(self.game_title)
         center_window(self.window_width, self.window_height)
-        root.minsize(500, 500)
+        root.minsize(600, 500)
 
         self.__add_components()
         self.extract_small_icon_list()
+        self.canvas = tk.Canvas()
 
     def easy_game(self):
         self.game_size = 6
-        self.icon_kind = self.game_size * self.game_size / 2
+        self.icon_kind = self.game_size * self.game_size / 4
+        print(self.icon_kind)
+        self.canvas_width = 290
+        self.canvas_height = 290
         self.new_game()
 
     def normal_game(self):
         self.game_size = 8
-        self.icon_kind = self.game_size * self.game_size / 2
+        self.icon_kind = self.game_size * self.game_size / 4
+        self.canvas_width = 370
+        self.canvas_height = 370
         self.new_game()
 
     def hard_game(self):
         self.game_size = 10
         self.icon_kind = self.game_size * self.game_size / 4
+        self.canvas_width = 450
+        self.canvas_height = 450
         self.new_game()
 
     def __add_components(self):
@@ -101,24 +111,22 @@ class MainWindow(object):
         :return:
         """
         self.menubar = tk.Menu(root, bg="lightgrey", fg="black")
-
         self.file_menu = tk.Menu(self.menubar, tearoff=0, bg="lightgrey", fg="black")
         self.file_menu.add_command(label="新游戏(低难度)", command=self.easy_game)  # 点击后，触发函数new_game
         self.file_menu.add_command(label="新游戏(中难度)", command=self.normal_game)  # 点击后，触发函数new_game
         self.file_menu.add_command(label="新游戏(高难度)", command=self.hard_game)  # 点击后，触发函数new_game
-
         self.menubar.add_cascade(label="游戏", menu=self.file_menu)
         root.configure(menu=self.menubar)
-
-        self.canvas = tk.Canvas(root, bg='white', width=450, height=450)
-        self.canvas.pack(side=tk.TOP, pady=5)
-        self.canvas.bind('<Button-1>', self.click_canvas)
 
     def new_game(self):
         """
         创建新游戏，初始化连连看游戏场景，并重新绘制连连看游戏场景
         :return:
         """
+        self.canvas.forget()
+        self.canvas = tk.Canvas(root, bg='white', width=self.canvas_width, height=self.canvas_height)
+        self.canvas.pack(side=tk.TOP, pady=5)
+        self.canvas.bind('<Button-1>', self.click_canvas)
         self.init_map()
         self.draw_map()
         self.is_game_start = True
