@@ -128,7 +128,6 @@ class MainWindow(object):
         创建新游戏，初始化连连看游戏场景，并重新绘制连连看游戏场景
         :return:
         """
-        self.canvas.forget()
         self.Text.forget()
         self.canvas = tk.Canvas(root, bg='white', width=self.canvas_width, height=self.canvas_height)
         self.canvas.pack(side=tk.TOP, pady=5)
@@ -201,6 +200,8 @@ class MainWindow(object):
                             if self.is_game_end():
                                 tk.messagebox.showinfo("You Win!", "恭喜你，～你胜利啦～(⁎⁍̴̛ᴗ⁍̴̛⁎)")
                                 self.is_game_start = False
+                                self.canvas.forget()
+                                self.Text.pack()
                         else:
                             self.former_point = point
                             self.canvas.delete("rectRedOne")
