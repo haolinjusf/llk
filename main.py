@@ -7,6 +7,10 @@ from PIL import Image, ImageTk
 
 root = tk.Tk()
 
+guide = '''
+欢迎使用植物连连看小程序\n请点击菜单栏选择游戏难度以开始游戏！( ´▽｀)
+'''
+
 
 class Point(object):
     def __init__(self, x: int, y: int):
@@ -86,9 +90,8 @@ class MainWindow(object):
     def easy_game(self):
         self.game_size = 6
         self.icon_kind = self.game_size * self.game_size / 4
-        print(self.icon_kind)
-        self.canvas_width = 290
-        self.canvas_height = 290
+        self.canvas_width = 287
+        self.canvas_height = 287
         self.new_game()
 
     def normal_game(self):
@@ -117,6 +120,8 @@ class MainWindow(object):
         self.file_menu.add_command(label="新游戏(高难度)", command=self.hard_game)  # 点击后，触发函数new_game
         self.menubar.add_cascade(label="游戏", menu=self.file_menu)
         root.configure(menu=self.menubar)
+        self.Text = tk.Label(root, text=guide, justify='center', font=('微软雅黑', 20), pady=100)
+        self.Text.pack()
 
     def new_game(self):
         """
@@ -124,6 +129,7 @@ class MainWindow(object):
         :return:
         """
         self.canvas.forget()
+        self.Text.forget()
         self.canvas = tk.Canvas(root, bg='white', width=self.canvas_width, height=self.canvas_height)
         self.canvas.pack(side=tk.TOP, pady=5)
         self.canvas.bind('<Button-1>', self.click_canvas)
