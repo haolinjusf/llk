@@ -296,7 +296,7 @@ class MainWindow(object):
         """
         idx = self.map[p1.y][p1.x]
         plant_name = self.plants[idx]
-        with open(f'plant_info/{plant_name}.txt', 'r') as f:
+        with open(f'plant_info/{plant_name}.txt', 'r', encoding='utf-8') as f:
             plant_info = f.readlines()
         self.map[p1.y][p1.x] = self.EMPTY
         self.map[p2.y][p2.x] = self.EMPTY
