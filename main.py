@@ -83,21 +83,7 @@ class MainWindow(object):
         self.extract_small_icon_list()
         self.canvas = tk.Canvas()
 
-    # def easy_game(self):
-    #     self.game_size = 6
-    #     self.icon_kind = self.game_size * self.game_size / 4
-    #     self.canvas_width = 287
-    #     self.canvas_height = 287
-    #     self.new_game()
-    #
-    # def normal_game(self):
-    #     self.game_size = 8
-    #     self.icon_kind = self.game_size * self.game_size / 4
-    #     self.canvas_width = 367
-    #     self.canvas_height = 367
-    #     self.new_game()
-
-    def hard_game(self):
+    def init_game(self):
         self.game_size = 10
         self.icon_kind = self.game_size * self.game_size / 4
         self.canvas_width = 450
@@ -111,9 +97,7 @@ class MainWindow(object):
         """
         self.menubar = tk.Menu(root, bg="lightgrey", fg="black")
         self.file_menu = tk.Menu(self.menubar, tearoff=0, bg="lightgrey", fg="black")
-        # self.file_menu.add_command(label="新游戏(低难度)", command=self.easy_game)  # 点击后，触发函数new_game
-        # self.file_menu.add_command(label="新游戏(中难度)", command=self.normal_game)  # 点击后，触发函数new_game
-        self.file_menu.add_command(label="新游戏", command=self.hard_game)  # 点击后，触发函数new_game
+        self.file_menu.add_command(label="新游戏", command=self.init_game)  # 点击后，触发函数new_game
         self.menubar.add_cascade(label="游戏", menu=self.file_menu)
         root.configure(menu=self.menubar)
         self.Text = tk.Label(root, text='欢迎使用植物连连看小程序\n请点击菜单栏选择游戏难度以开始游戏！( ´▽｀)',
