@@ -289,8 +289,7 @@ class MainWindow(object):
         """
         是否为直接连接
         """
-        # 水平
-        if p1.y == p2.y:
+        if p1.y == p2.y:  # 是否为水平直接连接
             if p2.x < p1.x:
                 start, end = p2.x, p1.x
             else:
@@ -299,7 +298,7 @@ class MainWindow(object):
                 if self.map[p1.y][x] != self.EMPTY:
                     return False
             return True
-        elif p1.x == p2.x:
+        elif p1.x == p2.x:  # 是否为垂直直接连接
             if p1.y > p2.y:
                 start, end = p2.y, p1.y
             else:
