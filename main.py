@@ -39,22 +39,25 @@ class MainWindow(object):
     主窗口类，为了更好地定义窗口的属性和逻辑，设置入口为__init__函数(构造函数)
     """
     plants = []  # 植物名称列表
-    game_title = "植物连连看"  # 窗口标题
-    window_width = 600  # 窗口宽度
-    window_height = 500  # 窗口长度
+    game_title = "霄嘟连连看"  # 窗口标题
+    window_width = 800  # 窗口宽度
+    window_height = 650  # 窗口长度
     icons = []  # 连连看图标列表
-    game_size = 10  # 游戏尺寸
-    icon_kind = game_size * game_size / 4  # 图标种类数量（图标数量需符合要求才能开始游戏）
-    icon_width = 40  # 图标宽度设置
-    icon_height = 40  # 图标长度设置
-    canvas_width = 450  # canvas的宽度
-    canvas_height = 450  # canvas的高度
+    icon_width = 60  # 图标宽度设置
+    icon_height = 60  # 图标长度设置
+    canvas_width = 730  # canvas的宽度
+    canvas_height = 610  # canvas的高度
+    game_size_x = canvas_width // icon_width  # 游戏尺寸
+    game_size_y = canvas_height // icon_height  # 游戏尺寸
+    # icon_kind = game_size_x * game_size_y // 4
+    icon_kind = game_size_x * game_size_y // 4  # 图标种类数量（图标数量需符合要求才能开始游戏）
     map = []  # 游戏地图
     is_first = True  # 标记当前点击的方块是否是第一次点击标记值，如果是，则绘制红方块，如果不是则判断连接
     is_game_start = False  # 记录游戏是否开始
     former_point = None  # 记录前一个点
     # 以下是定义的常量
-    delta = 25
+    delta_x = (canvas_width % icon_width) / 2
+    delta_y = (canvas_height % icon_height) / 2
     EMPTY = -1
     NONE_LINK = 0
     STRAIGHT_LINK = 1
@@ -68,13 +71,15 @@ class MainWindow(object):
         self.center_window(self.window_width, self.window_height)  # 设置窗口在屏幕的正中间
         self.menubar = tk.Menu(root)  # 设置目录栏
         self.file_menu = tk.Menu(self.menubar)  # 设置下拉栏的内容
+        self.icons = []
+        self.extract_small_icon_list()
+        self.icon_kind = len(self.icons) if self.icon_kind > len(self.icons) > 0 else self.icon_kind
         self.file_menu.add_command(label="新游戏", command=self.new_game)  # 点击后，触发函数new_game
         self.menubar.add_cascade(label="游戏", menu=self.file_menu)  # 设置一个游戏目录，点击后可以看到下拉栏内容
         self.Text = tk.Label(root, text='欢迎使用植物连连看小程序\n请点击菜单栏选择游戏难度以开始游戏！( ´▽｀)',
                              justify='center', font=('微软雅黑', 20), pady=100)
         self.Text.pack()
         self.canvas = tk.Canvas()
-        self.extract_small_icon_list()
         # 以上是设置各种组键，以下是将各种组键判定给root对象，root对象是Tk实例
         root.title(self.game_title)
         root.configure(menu=self.menubar)
@@ -99,29 +104,30 @@ class MainWindow(object):
         self.map = []
         tmp_records = []
         records = []
-        for i in range(0, int(self.icon_kind)):
-            for j in range(0, 4):
-                tmp_records.append(i)
+        total = self.game_size_x * self.game_size_y
+        while len(tmp_records) < total:
+            for i in range(0, self.icon_kind):
+                for j in range(0, 2):
+                    tmp_records.append(i)
 
-        total = self.game_size * self.game_size
         for x in range(0, total):
-            index = random.randint(0, total - x - 1)
+            index = random.randint(0, len(tmp_records)-1)
             records.append(tmp_records[index])
             del tmp_records[index]
 
-        for y in range(0, self.game_size):
-            for x in range(0, self.game_size):
+        for y in range(0, self.game_size_y):
+            for x in range(0, self.game_size_x):
                 if x == 0:
                     self.map.append([])
-                self.map[y].append(records[x + y * self.game_size])
+                self.map[y].append(records[x + y * self.game_size_x])
 
     def draw_map(self):
         """
         绘制游戏场景
         """
         self.canvas.delete("all")
-        for y in range(0, self.game_size):
-            for x in range(0, self.game_size):
+        for y in range(0, self.game_size_y):
+            for x in range(0, self.game_size_x):
                 point = self.get_outer_left_top_point(Point(x, y))
                 self.canvas.create_image((point.x, point.y), image=self.icons[self.map[y][x]], anchor='nw',
                                          tags='im%d%d' % (x, y))  # 让canvas上显示植物图片
@@ -153,9 +159,10 @@ class MainWindow(object):
                         self.is_first = True
                         self.canvas.delete("rectRedOne")
                     else:
-                        link_type = self.get_link_type(self.former_point, point)  # 这里获取了联通类型
+                        link_type = self.get_link_type(self.former_point, point)  # 这里获取了连通类型
                         if link_type != self.NONE_LINK:  # 如果不是无连接，则消除这两个点
                             self.clear_linked_blocks(self.former_point, point)  # 执行消除的函数
+                            self.canvas.delete("rectRedOne")
                             self.is_first = True
                             # 判断游戏是否结束
                             if self.is_game_end():
@@ -165,16 +172,16 @@ class MainWindow(object):
                                 self.canvas.forget()
                                 self.Text.pack()
                         else:
+                            self.canvas.delete("rectRedOne")
                             self.former_point = point
                             self.draw_selected_area(point)
-                    self.canvas.delete("rectRedOne")  # 让红色的正方形消除
 
     def is_game_end(self):
         """
         判断游戏是否结束，如果地图中所有的点都为空，则代表游戏已经结束了
         """
-        for y in range(0, self.game_size):
-            for x in range(0, self.game_size):
+        for y in range(0, self.game_size_y):
+            for x in range(0, self.game_size_x):
                 if self.map[y][x] != self.EMPTY:
                     return False
         return True
@@ -188,7 +195,9 @@ class MainWindow(object):
             if img.split('.')[-1] in {'jpg', 'png'}:
                 if idx >= self.icon_kind:
                     break
-                self.icons.append(ImageTk.PhotoImage(Image.open(path + '/' + img)))  # 获取图片
+                ictmp = Image.open(path+'/'+img)  # 加载图像并保存到tmp_img中，保存图像名称为img
+                ictmp.thumbnail((self.icon_width, self.icon_height))
+                self.icons.append(ImageTk.PhotoImage(ictmp))  # 获取图片
                 self.plants.append(img.split('.')[0])
                 idx += 1
 
@@ -206,23 +215,23 @@ class MainWindow(object):
                      self.get_y(point.y) + int(self.icon_height / 2))
 
     def get_x(self, x):
-        return x * self.icon_width + self.delta
+        return x * self.icon_width + self.delta_x
 
     def get_y(self, y):
-        return y * self.icon_height + self.delta
+        return y * self.icon_height + self.delta_y
 
     def get_inner_point(self, point):
         """
         获取内部坐标
         """
         x, y = -1, -1
-        for i in range(0, self.game_size):
+        for i in range(0, self.game_size_x):
             x1 = self.get_x(i)
             x2 = self.get_x(i + 1)
             if x1 <= point.x < x2:
                 x = i
 
-        for j in range(0, self.game_size):
+        for j in range(0, self.game_size_y):
             j1 = self.get_y(j)
             j2 = self.get_y(j + 1)
             if j1 <= point.y < j2:
@@ -245,17 +254,17 @@ class MainWindow(object):
         """
         idx = self.map[p1.y][p1.x]
         plant_name = self.plants[idx]
-        with open(f'plant_info/{plant_name}.txt', 'r', encoding='utf-8'
-                  ) as f:  # 上次有错误是因为没有设置encoding='utf-8'，导致Windows下的编码问题
-            plant_info = f.readlines()
+        # with open(f'plant_info/{plant_name}.txt', 'r', encoding='utf-8'
+        #           ) as f:  # 上次有错误是因为没有设置encoding='utf-8'，导致Windows下的编码问题
+        #     plant_info = f.readlines()
         self.map[p1.y][p1.x] = self.EMPTY
         self.map[p2.y][p2.x] = self.EMPTY
         self.canvas.delete('im%d%d' % (p1.x, p1.y))
         self.canvas.delete('im%d%d' % (p2.x, p2.y))
-        messagebox.showwarning(
-            title='植物详情',
-            message=f'植物名称：{plant_name}\n植物介绍：{"".join(plant_info)}',
-        )  # 这是一个消息块，用于显示植物的信息，其中标题和内容如上所示
+        # messagebox.showwarning(
+        #     title='植物详情',
+        #     message=f'植物名称：{plant_name}\n植物介绍：{"".join(plant_info)}',
+        # )  # 这是一个消息块，用于显示植物的信息，其中标题和内容如上所示
 
     def not_in_map(self, point):
         """
@@ -328,10 +337,18 @@ class MainWindow(object):
         是否是有两个拐点的连接。
         """
 
-        def check(idx: int, p_1: Point, p_2: Point) -> bool:
-            if idx == p1.y or idx == p2.y:
-                return False
-            if idx == -1 or idx == self.game_size:
+        def check(id: int, p_1: Point, p_2: Point, ax: str) -> bool:
+            if ax == 'x':
+                id1 = p1.x
+                id2 = p2.x
+                gsize = self.game_size_x
+            if ax == 'y':
+                id1 = p1.y
+                id2 = p2.y
+                gsize = self.game_size_y
+            if id == id1 or id == id2:
+                    return False
+            if id == -1 or id == gsize:
                 if self.is_straight(p1, p_1) and self.is_straight(p_2, p2):
                     return True
             else:
@@ -340,14 +357,14 @@ class MainWindow(object):
                         return True
             return False
 
-        for y in range(-1, self.game_size + 1):
+        for y in range(-1, self.game_size_y+1):
             point1, point2 = Point(p1.x, y), Point(p2.x, y)
-            if check(y, point1, point2):
+            if check(y, point1, point2, 'y'):
                 return {'p1': point1, 'p2': point2}
 
-        for x in range(-1, self.game_size + 1):
+        for x in range(-1, self.game_size_x+1):
             point1, point2 = Point(x, p1.y), Point(x, p2.y)
-            if check(x, point1, point2):
+            if check(x, point1, point2, 'x'):
                 return {'p1': point1, 'p2': point2}
 
 
