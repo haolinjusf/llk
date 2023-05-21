@@ -40,16 +40,15 @@ class MainWindow(object):
     """
     plants = []  # 植物名称列表
     game_title = "霄嘟连连看"  # 窗口标题
-    window_width = 800  # 窗口宽度
-    window_height = 650  # 窗口长度
+    window_width = 1300  # 窗口宽度
+    window_height = 700  # 窗口长度
     icons = []  # 连连看图标列表
-    icon_width = 60  # 图标宽度设置
-    icon_height = 60  # 图标长度设置
-    canvas_width = 730  # canvas的宽度
-    canvas_height = 610  # canvas的高度
+    icon_width = 70  # 图标宽度设置
+    icon_height = 70  # 图标长度设置
+    canvas_width = 1290  # canvas的宽度
+    canvas_height = 690  # canvas的高度
     game_size_x = canvas_width // icon_width  # 游戏尺寸
     game_size_y = canvas_height // icon_height  # 游戏尺寸
-    # icon_kind = game_size_x * game_size_y // 4
     icon_kind = game_size_x * game_size_y // 4  # 图标种类数量（图标数量需符合要求才能开始游戏）
     map = []  # 游戏地图
     is_first = True  # 标记当前点击的方块是否是第一次点击标记值，如果是，则绘制红方块，如果不是则判断连接
@@ -71,9 +70,9 @@ class MainWindow(object):
         self.center_window(self.window_width, self.window_height)  # 设置窗口在屏幕的正中间
         self.menubar = tk.Menu(root)  # 设置目录栏
         self.file_menu = tk.Menu(self.menubar)  # 设置下拉栏的内容
-        self.icons = []
+        # self.icons = []
         self.extract_small_icon_list()
-        self.icon_kind = len(self.icons) if self.icon_kind > len(self.icons) > 0 else self.icon_kind
+        # self.icon_kind = len(self.icons) if self.icon_kind > len(self.icons) > 0 else self.icon_kind
         self.file_menu.add_command(label="新游戏", command=self.new_game)  # 点击后，触发函数new_game
         self.menubar.add_cascade(label="游戏", menu=self.file_menu)  # 设置一个游戏目录，点击后可以看到下拉栏内容
         self.Text = tk.Label(root, text='欢迎使用植物连连看小程序\n请点击菜单栏选择游戏难度以开始游戏！( ´▽｀)',
@@ -106,9 +105,11 @@ class MainWindow(object):
         records = []
         total = self.game_size_x * self.game_size_y
         while len(tmp_records) < total:
-            for i in range(0, self.icon_kind):
+            for i in range(0, min(self.icon_kind, len(self.icons))):
                 for j in range(0, 2):
                     tmp_records.append(i)
+                if len(tmp_records) >= total:  # 检查是否已经达到总数量级了，如果达到
+                    break
 
         for x in range(0, total):
             index = random.randint(0, len(tmp_records)-1)
@@ -139,7 +140,7 @@ class MainWindow(object):
         """
         screenwidth = root.winfo_screenwidth()
         screenheight = root.winfo_screenheight()
-        size = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
+        size = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 4)
         root.geometry(size)
 
     def click_canvas(self, event):
